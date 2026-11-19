@@ -1,3 +1,5 @@
+avant d'acceder a la page web de ce projet veuiller a bien demarer en local le serveur flask et les autres projet en liens avec ce projet doive etre installer aussi 
+
 # 🛰 WatchTower — mini-SIEM
 
 WatchTower est un **mini-SIEM** (Security Information and Event Management) écrit en Python avec Flask.
