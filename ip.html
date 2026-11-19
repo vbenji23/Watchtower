@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}{{ p.ip }} - WatchTower{% endblock %}
+{% block content %}
+<a href="{{ url_for('dashboard') }}" class="back">← Retour</a>
+<h1>Profil de l'IP {{ p.ip }}</h1>
+
+<section class="cards">
+    <div class="card"><span class="num">{{ p.count }}</span><span class="label">Alertes</span></div>
+    <div class="card {% if p.sources|length > 1 %}critical{% endif %}">
+        <span class="num">{{ p.sources|length }}</span><span class="label">Outils touchés</span>
+    </div>
+    <div class="card"><span class="num small">{{ p.first_seen }}</span><span class="label">Première vue</span></div>
+    <div class="card"><span class="num small">{{ p.last_seen }}</span><span class="label">Dernière vue</span></div>
+</section>
+
+<p>Outils : {% for s in p.sources %}<span class="tag {{ s }}">{{ s }}</span> {% endfor %}</p>
+
+<section class="panel">
+    <h2>Chronologie</h2>
+    <table>
+        <thead><tr><th>Date</th><th>Outil</th><th>Type</th><th>Gravité</th><th>Détails</th></tr></thead>
+        <tbody>
+        {% for a in p.alerts %}
+            <tr>
+                <td class="nowrap">{{ a.timestamp }}</td>
+                <td><span class="tag {{ a.source }}">{{ a.source }}</span></td>
+                <td>{{ a.type }}</td>
+                <td><span class="badge {{ a.severity }}">{{ a.severity }}</span></td>
+                <td class="details">{{ a.details }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}

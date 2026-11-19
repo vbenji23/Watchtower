@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Connexion - WatchTower{% endblock %}
+{% block content %}
+<div class="login-box">
+    <h1>Connexion</h1>
+    {% if error %}<p class="error">{{ error }}</p>{% endif %}
+    <form method="post">
+        <label for="password">Mot de passe</label>
+        <input type="password" id="password" name="password" autofocus required>
+        <button type="submit">Entrer</button>
+    </form>
+</div>
+{% endblock %}

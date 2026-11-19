@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="cards">
+    <div class="card"><span class="num">{{ stats.total }}</span><span class="label">Alertes au total</span></div>
+    <div class="card"><span class="num">{{ stats.last_24h }}</span><span class="label">Dernières 24 h</span></div>
+    <div class="card"><span class="num">{{ stats.unique_ips }}</span><span class="label">IP uniques</span></div>
+    <div class="card critical"><span class="num">{{ stats.critical }}</span><span class="label">Critiques</span></div>
+</section>
+
+<section class="charts">
+    <div class="panel wide">
+        <h2>Alertes par heure (24 h)</h2>
+        <canvas id="timelineChart"></canvas>
+    </div>
+    <div class="panel">
+        <h2>Par outil</h2>
+        <canvas id="sourceChart"></canvas>
+    </div>
+</section>
+
+<section class="row">
+    <div class="panel">
+        <h2>Top IP attaquantes</h2>
+        <table>
+            <thead><tr><th>IP</th><th>Alertes</th><th>Outils</th></tr></thead>
+            <tbody>
+            {% for t in top_ips %}
+                <tr>
+                    <td><a href="{{ url_for('ip_detail', ip=t.src_ip) }}">{{ t.src_ip }}</a></td>
+                    <td>{{ t.n }}</td>
+                    <td>{% if t.nb_sources > 1 %}<span class="badge critical">{{ t.nb_sources }}</span>{% else %}{{ t.nb_sources }}{% endif %}</td>
+                </tr>
+            {% else %}
+                <tr><td colspan="3">Aucune donnée</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="panel">
+    <h2>Alertes</h2>
+    <form method="get" class="filters">
+        <select name="source">
+            <option value="">Tous les outils</option>
+            {% for s in sources %}
+            <option value="{{ s }}" {% if s == f_source %}selected{% endif %}>{{ s }}</option>
+            {% endfor %}
+        </select>
+        <select name="severity">
+            <option value="">Toutes gravités</option>
+            {% for s in severities %}
+            <option value="{{ s }}" {% if s == f_severity %}selected{% endif %}>{{ s }}</option>
+            {% endfor %}
+        </select>
+        <input type="text" name="ip" placeholder="IP (début)" value="{{ f_ip }}">
+        <button type="submit">Filtrer</button>
+        <a href="{{ url_for('dashboard') }}" class="reset">Réinitialiser</a>
+    </form>
+
+    <table>
+        <thead>
+            <tr><th>Date</th><th>Outil</th><th>Type</th><th>Gravité</th><th>IP</th><th>Détails</th></tr>
+        </thead>
+        <tbody>
+        {% for a in alerts %}
+            <tr>
+                <td class="nowrap">{{ a.timestamp }}</td>
+                <td><span class="tag {{ a.source }}">{{ a.source }}</span></td>
+                <td>{{ a.type }}</td>
+                <td><span class="badge {{ a.severity }}">{{ a.severity }}</span></td>
+                <td><a href="{{ url_for('ip_detail', ip=a.src_ip) }}">{{ a.src_ip }}</a></td>
+                <td class="details">{{ a.details }}</td>
+            </tr>
+        {% else %}
+            <tr><td colspan="6">Aucune alerte. Lance <code>python send_test_alerts.py</code> pour tester.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="{{ url_for('static', filename='dashboard.js') }}"></script>
+{% endblock %}
